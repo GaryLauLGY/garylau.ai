@@ -7,7 +7,6 @@ function AboutWindow() {
     <section className="about-window" aria-labelledby="about-name">
       <div className="retro-titlebar" aria-hidden="true">
         <div className="retro-title-left">
-          <span className="retro-icon">G</span>
           <span>PROFILE.EXE</span>
         </div>
 
