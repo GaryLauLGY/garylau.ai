@@ -85,9 +85,9 @@ body,
 .about-window {
   position: absolute;
   z-index: 3;
-  top: clamp(140px, 24vh, 260px);
+  top: clamp(140px, 22vh, 230px);
   left: clamp(72px, 15vw, 300px);
-  width: clamp(440px, 42vw, 620px);
+  width: clamp(560px, 42vw, 680px);
   overflow: hidden;
   border: 2px solid #fff;
   border-right-color: #000;
@@ -246,6 +246,24 @@ body,
 .retro-status-panel strong {
   color: #008000;
   font-weight: 700;
+  animation: status-blink 1s step-end infinite;
+}
+
+@keyframes status-blink {
+  0%,
+  46% {
+    opacity: 1;
+  }
+
+  47%,
+  76% {
+    opacity: 0;
+  }
+
+  77%,
+  100% {
+    opacity: 1;
+  }
 }
 
 .retro-scanlines {
@@ -280,23 +298,23 @@ body,
   -webkit-user-drag: none;
 }
 
-@media (max-aspect-ratio: 1 / 1) {
+@media (max-width: 1240px) {
   .about-window {
-    top: 72px;
-    right: 18px;
-    left: 18px;
-    width: auto;
-    transform: none;
+    top: clamp(76px, 9svh, 100px);
+    right: auto;
+    left: 50%;
+    width: min(680px, calc(100vw - 48px));
+    transform: translateX(-50%);
   }
 
   .retro-window-body {
-    min-height: 0;
+    min-height: clamp(300px, 36svh, 390px);
   }
 
   .hero-video {
     right: 50%;
-    width: 76vw;
-    height: auto;
+    width: auto;
+    height: min(46svh, 520px);
     transform: translateX(50%);
   }
 }
@@ -324,9 +342,11 @@ body,
 
   .about-window {
     top: 64px;
+    width: calc(100vw - 28px);
   }
 
   .retro-window-body {
+    min-height: 0;
     padding: 16px;
     gap: 18px;
   }
@@ -351,6 +371,12 @@ body,
 
   .hero-video {
     width: auto;
-    height: 42svh;
+    height: 40svh;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .retro-status-panel strong {
+    animation: none;
   }
 }

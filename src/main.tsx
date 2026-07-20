@@ -42,7 +42,7 @@ function AboutWindow() {
 
         <div className="retro-status-panel">
           <span>STATUS:</span>
-          <strong>PROFILE LOADED</strong>
+          <strong>UPGRADING...</strong>
         </div>
       </div>
 
