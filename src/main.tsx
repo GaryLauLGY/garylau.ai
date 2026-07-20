@@ -63,6 +63,9 @@ function ScrubVideo() {
 
     const sensitivity = 0.8
     const seekTolerance = 1 / 48
+    const motionVideoUrl = '/assets/mainframe-robot-motion.mp4'
+    const preloadController = new AbortController()
+    let objectUrl: string | null = null
 
     const seekToTarget = () => {
       if (seekingRef.current || !Number.isFinite(video.duration)) return
@@ -122,9 +125,32 @@ function ScrubVideo() {
     window.addEventListener('blur', resetPointer)
     document.documentElement.addEventListener('mouseleave', resetPointer)
 
-    if (video.readyState >= HTMLMediaElement.HAVE_METADATA) onMetadata()
+    const preloadVideo = async () => {
+      try {
+        const response = await fetch(motionVideoUrl, {
+          cache: 'force-cache',
+          signal: preloadController.signal,
+        })
+
+        if (!response.ok) throw new Error(`Video preload failed: ${response.status}`)
+
+        const videoBlob = await response.blob()
+        if (preloadController.signal.aborted) return
+
+        objectUrl = URL.createObjectURL(videoBlob)
+        video.src = objectUrl
+        video.load()
+      } catch {
+        if (preloadController.signal.aborted) return
+        video.src = motionVideoUrl
+        video.load()
+      }
+    }
+
+    void preloadVideo()
 
     return () => {
+      preloadController.abort()
       video.removeEventListener('loadedmetadata', onMetadata)
       video.removeEventListener('seeked', onSeeked)
       window.removeEventListener('mousemove', onMouseMove)
@@ -134,6 +160,7 @@ function ScrubVideo() {
       window.removeEventListener('touchcancel', resetPointer)
       window.removeEventListener('blur', resetPointer)
       document.documentElement.removeEventListener('mouseleave', resetPointer)
+      if (objectUrl) URL.revokeObjectURL(objectUrl)
     }
   }, [])
 
@@ -163,10 +190,7 @@ function ScrubVideo() {
         poster="/assets/mainframe-robot-poster.png"
         draggable={false}
         aria-label="GaryLau CRT-headed figure controlled by horizontal pointer movement"
-      >
-        <source src="/assets/mainframe-robot-motion.mp4" type="video/mp4" />
-        <source src="/assets/mainframe-robot-motion.webm" type="video/webm" />
-      </video>
+      />
     </main>
   )
 }
