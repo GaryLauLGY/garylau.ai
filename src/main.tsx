@@ -27,7 +27,7 @@ function AboutWindow() {
           <dl className="retro-profile-list">
             <div>
               <dt>EDUCATION</dt>
-              <dd>华南理工大学本科</dd>
+              <dd>华南理工大学</dd>
             </div>
             <div>
               <dt>ROLE</dt>

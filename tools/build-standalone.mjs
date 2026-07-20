@@ -23,7 +23,7 @@ const standalone = `<!doctype html>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#d9d9d6" />
+    <meta name="theme-color" content="#292929" />
     <meta name="description" content="Mainframe — an independent creative studio for ideas with a pulse." />
     <title>GaryLau｜刘耕宇</title>
     <style>${css}</style>
