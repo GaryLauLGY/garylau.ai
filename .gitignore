@@ -1,0 +1,10 @@
+node_modules/
+dist/
+*.tsbuildinfo
+.DS_Store
+
+# Local production materials that are not needed by the website runtime.
+deliverables/
+tools/previews/
+tools/source-assets/
+tools/__pycache__/
