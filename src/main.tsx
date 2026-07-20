@@ -63,7 +63,7 @@ function ScrubVideo() {
 
     const sensitivity = 0.8
     const seekTolerance = 1 / 48
-    const motionVideoUrl = '/assets/mainframe-robot-motion.mp4?v=dark-1'
+    const motionVideoUrl = '/assets/mainframe-robot-motion.mp4?v=white-2'
     const preloadController = new AbortController()
     let objectUrl: string | null = null
 

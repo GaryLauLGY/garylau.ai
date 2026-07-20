@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  background: #292929;
+  background: #fff;
   color-scheme: light;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
   font-synthesis: none;
@@ -27,7 +27,7 @@ body,
   inset: 0;
   isolation: isolate;
   overflow: hidden;
-  background: #292929;
+  background: #fff;
   touch-action: none;
 }
 
