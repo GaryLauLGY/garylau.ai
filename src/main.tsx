@@ -51,10 +51,11 @@ function AboutWindow() {
 }
 
 const socialLinks = [
-  { label: 'X：Gary', href: 'https://x.com/GaryLau0101' },
-  { label: '抖音：Claude最严厉的Father', href: 'https://v.douyin.com/RJE8xC9wAvI/' },
+  { platform: 'X', account: 'Gary', href: 'https://x.com/GaryLau0101' },
+  { platform: '抖音', account: 'Claude最严厉的Father', href: 'https://v.douyin.com/RJE8xC9wAvI/' },
   {
-    label: '小红书：Claude最严厉的Father',
+    platform: '小红书',
+    account: 'Claude最严厉的Father',
     href: 'https://www.xiaohongshu.com/user/profile/60c395d00000000001007109',
   },
 ]
@@ -75,8 +76,11 @@ function SocialWindow() {
 
       <div className="social-window-body">
         {socialLinks.map((link) => (
-          <a key={link.label} className="social-link" href={link.href} target="_blank" rel="noreferrer">
-            <span>{link.label}</span>
+          <a key={link.platform} className="social-link" href={link.href} target="_blank" rel="noreferrer">
+            <span className="social-link-copy">
+              <strong>{link.platform}：</strong>
+              <span className="social-account">{link.account}</span>
+            </span>
             <span aria-hidden="true">↗</span>
           </a>
         ))}
