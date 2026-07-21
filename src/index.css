@@ -82,12 +82,20 @@ body,
   line-height: 1;
 }
 
-.about-window {
+.profile-cluster {
   position: absolute;
   z-index: 3;
-  top: clamp(140px, 22vh, 230px);
+  top: clamp(92px, 14vh, 150px);
   left: clamp(72px, 15vw, 300px);
   width: clamp(560px, 42vw, 680px);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.about-window,
+.social-window {
+  position: relative;
   overflow: hidden;
   border: 2px solid #fff;
   border-right-color: #000;
@@ -99,7 +107,20 @@ body,
     10px 12px 0 rgba(0, 0, 0, 0.12);
   color: #222;
   font-family: "MS Sans Serif", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.about-window {
+  width: 100%;
   pointer-events: none;
+}
+
+.social-window {
+  width: 60%;
+  box-shadow:
+    inset 1px 1px 0 #fff,
+    inset -1px -1px 0 #404040,
+    8px 10px 0 rgba(0, 0, 0, 0.1);
+  pointer-events: auto;
 }
 
 .retro-titlebar {
@@ -241,6 +262,41 @@ body,
   animation: status-blink 1s step-end infinite;
 }
 
+.social-window-body {
+  display: grid;
+  padding: 12px 14px 14px;
+  gap: 7px;
+}
+
+.social-link {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  min-height: 32px;
+  padding: 7px 10px;
+  border: 2px solid #fff;
+  border-right-color: #404040;
+  border-bottom-color: #404040;
+  background: #f7f7f7;
+  color: #111;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.social-link:hover {
+  background: #000;
+  color: #fff;
+}
+
+.social-link:focus-visible {
+  outline: 2px dashed #000;
+  outline-offset: 3px;
+}
+
 @keyframes status-blink {
   0%,
   46% {
@@ -291,8 +347,8 @@ body,
 }
 
 @media (max-width: 1240px) {
-  .about-window {
-    top: clamp(76px, 9svh, 100px);
+  .profile-cluster {
+    top: clamp(68px, 7svh, 82px);
     right: auto;
     left: 50%;
     width: min(680px, calc(100vw - 48px));
@@ -300,13 +356,13 @@ body,
   }
 
   .retro-window-body {
-    min-height: clamp(300px, 36svh, 390px);
+    min-height: clamp(240px, 28svh, 330px);
   }
 
   .hero-video {
     right: 50%;
     width: auto;
-    height: min(46svh, 520px);
+    height: min(34svh, 420px);
     transform: translateX(50%);
   }
 }
@@ -332,9 +388,13 @@ body,
     font-size: 12px;
   }
 
-  .about-window {
+  .profile-cluster {
     top: 64px;
     width: calc(100vw - 28px);
+  }
+
+  .social-window {
+    width: 100%;
   }
 
   .retro-window-body {
@@ -363,7 +423,7 @@ body,
 
   .hero-video {
     width: auto;
-    height: 40svh;
+    height: 34svh;
   }
 }
 

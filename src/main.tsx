@@ -50,6 +50,43 @@ function AboutWindow() {
   )
 }
 
+const socialLinks = [
+  { label: 'X', href: 'https://x.com/GaryLau0101' },
+  { label: '抖音', href: 'https://v.douyin.com/RJE8xC9wAvI/' },
+  {
+    label: '小红书',
+    href: 'https://www.xiaohongshu.com/user/profile/60c395d00000000001007109',
+  },
+]
+
+function SocialWindow() {
+  return (
+    <aside className="social-window" aria-label="社交媒体账号">
+      <div className="retro-titlebar">
+        <div className="retro-title-left">
+          <span>SOCIAL.LNK</span>
+        </div>
+
+        <div className="retro-window-buttons" aria-hidden="true">
+          <span className="retro-window-button">_</span>
+          <span className="retro-window-button">X</span>
+        </div>
+      </div>
+
+      <div className="social-window-body">
+        {socialLinks.map((link) => (
+          <a key={link.label} className="social-link" href={link.href} target="_blank" rel="noreferrer">
+            <span>{link.label}</span>
+            <span aria-hidden="true">↗</span>
+          </a>
+        ))}
+      </div>
+
+      <span className="retro-scanlines" aria-hidden="true" />
+    </aside>
+  )
+}
+
 function ScrubVideo() {
   const videoRef = useRef<HTMLVideoElement>(null)
   const targetTimeRef = useRef(0)
@@ -178,7 +215,10 @@ function ScrubVideo() {
         </div>
       </header>
 
-      <AboutWindow />
+      <div className="profile-cluster">
+        <AboutWindow />
+        <SocialWindow />
+      </div>
 
       <video
         ref={videoRef}
