@@ -85,12 +85,12 @@ body,
 .profile-cluster {
   position: absolute;
   z-index: 3;
-  top: clamp(92px, 14vh, 150px);
+  top: clamp(76px, 12vh, 130px);
   left: clamp(72px, 15vw, 300px);
   width: clamp(560px, 42vw, 680px);
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 40px;
 }
 
 .about-window,
@@ -115,7 +115,7 @@ body,
 }
 
 .social-window {
-  width: 60%;
+  width: 40%;
   box-shadow:
     inset 1px 1px 0 #fff,
     inset -1px -1px 0 #404040,
@@ -287,6 +287,13 @@ body,
   text-decoration: none;
 }
 
+.social-link span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .social-link:hover {
   background: #000;
   color: #fff;
@@ -348,7 +355,7 @@ body,
 
 @media (max-width: 1240px) {
   .profile-cluster {
-    top: clamp(68px, 7svh, 82px);
+    top: clamp(58px, 6svh, 70px);
     right: auto;
     left: 50%;
     width: min(680px, calc(100vw - 48px));
@@ -391,6 +398,7 @@ body,
   .profile-cluster {
     top: 64px;
     width: calc(100vw - 28px);
+    gap: 20px;
   }
 
   .social-window {

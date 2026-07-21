@@ -51,10 +51,10 @@ function AboutWindow() {
 }
 
 const socialLinks = [
-  { label: 'X', href: 'https://x.com/GaryLau0101' },
-  { label: '抖音', href: 'https://v.douyin.com/RJE8xC9wAvI/' },
+  { label: 'X：Gary', href: 'https://x.com/GaryLau0101' },
+  { label: '抖音：Claude最严厉的Father', href: 'https://v.douyin.com/RJE8xC9wAvI/' },
   {
-    label: '小红书',
+    label: '小红书：Claude最严厉的Father',
     href: 'https://www.xiaohongshu.com/user/profile/60c395d00000000001007109',
   },
 ]
