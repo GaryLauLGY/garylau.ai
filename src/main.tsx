@@ -30,11 +30,20 @@ function AboutWindow() {
             </div>
             <div>
               <dt>ROLE</dt>
-              <dd>AI co-founder</dd>
+              <dd className="retro-list-lines">
+                <span>AI co-founder</span>
+                <span>Google 认证 AI 教育家</span>
+                <span>Anthropic 官方认证 AI 应用专家</span>
+              </dd>
             </div>
             <div>
               <dt>FOCUS</dt>
-              <dd>AI Agent、知识库、AI 工作流、GEO 优化</dd>
+              <dd className="retro-list-lines">
+                <span>AI Agent 部署</span>
+                <span>知识库搭建</span>
+                <span>AI 工作流搭建</span>
+                <span>GEO 优化</span>
+              </dd>
             </div>
           </dl>
         </div>

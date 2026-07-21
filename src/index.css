@@ -241,6 +241,15 @@ body,
   min-width: 0;
 }
 
+.retro-list-lines {
+  display: grid;
+  gap: 3px;
+}
+
+.retro-list-lines span {
+  display: block;
+}
+
 .retro-status-panel {
   display: flex;
   min-height: 34px;
