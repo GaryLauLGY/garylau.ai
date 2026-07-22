@@ -261,7 +261,13 @@ function WechatQrWindow() {
 
       <div className="qr-window-body">
         <div className="qr-crop">
-          <img src="/assets/wechat-garylau-qr.jpg" alt="GaryLau 微信二维码" />
+          <img
+            src="/assets/wechat-garylau-qr.webp"
+            alt="GaryLau 微信二维码"
+            width="384"
+            height="384"
+            decoding="async"
+          />
         </div>
       </div>
     </aside>
