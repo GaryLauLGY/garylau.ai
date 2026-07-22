@@ -24,6 +24,9 @@ const standalone = `<!doctype html>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#ffffff" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+    <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1" />
+    <meta name="baiduspider" content="index, follow" />
     <meta name="description" content="Gary Lau｜刘耕宇，AI co-founder、Google 认证 AI 教育家、Anthropic 官方认证 AI 应用专家。专注 AI Agent 部署、知识库搭建、AI 工作流搭建与 GEO 优化。" />
     <link rel="canonical" href="https://garylau.ai/" />
     <meta property="og:type" content="website" />
@@ -34,6 +37,25 @@ const standalone = `<!doctype html>
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content="Gary Lau｜刘耕宇" />
     <meta name="twitter:description" content="AI co-founder、Google 认证 AI 教育家、Anthropic 官方认证 AI 应用专家。专注 AI Agent 部署、知识库搭建、AI 工作流搭建与 GEO 优化。" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Gary Lau",
+        "alternateName": "刘耕宇",
+        "url": "https://garylau.ai/",
+        "jobTitle": "AI co-founder",
+        "affiliation": {
+          "@type": "CollegeOrUniversity",
+          "name": "华南理工大学"
+        },
+        "knowsAbout": ["AI Agent 部署", "知识库搭建", "AI 工作流搭建", "GEO 优化"],
+        "sameAs": [
+          "https://x.com/GaryLau0101",
+          "https://www.xiaohongshu.com/user/profile/60c395d00000000001007109"
+        ]
+      }
+    </script>
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" defer></script>
     <title>Gary Lau｜刘耕宇</title>
     <style>${css}</style>
