@@ -1,6 +1,8 @@
 import {
+  CSSProperties,
   FormEvent,
   MouseEvent as ReactMouseEvent,
+  RefObject,
   useCallback,
   useEffect,
   useRef,
@@ -138,6 +140,130 @@ function CurrentProjectsWindow() {
       </div>
 
       <span className="retro-scanlines" aria-hidden="true" />
+    </aside>
+  )
+}
+
+const copyText = async (text: string) => {
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(text)
+    return
+  }
+
+  const textarea = document.createElement('textarea')
+  textarea.value = text
+  textarea.style.position = 'fixed'
+  textarea.style.opacity = '0'
+  document.body.appendChild(textarea)
+  textarea.select()
+  document.execCommand('copy')
+  textarea.remove()
+}
+
+function OtherContactWindow() {
+  const [copiedContact, setCopiedContact] = useState<'wechat' | 'qq' | null>(null)
+  const copiedTimerRef = useRef<number | null>(null)
+
+  useEffect(
+    () => () => {
+      if (copiedTimerRef.current) window.clearTimeout(copiedTimerRef.current)
+    },
+    [],
+  )
+
+  const handleContactCopy = async (value: string, contact: 'wechat' | 'qq') => {
+    try {
+      await copyText(value)
+      setCopiedContact(contact)
+      if (copiedTimerRef.current) window.clearTimeout(copiedTimerRef.current)
+      copiedTimerRef.current = window.setTimeout(() => setCopiedContact(null), 1800)
+    } catch {
+      setCopiedContact(null)
+    }
+  }
+
+  return (
+    <aside className="contact-links-window" aria-label="其他联系方式">
+      <div className="retro-titlebar">
+        <div className="retro-title-left">
+          <span>CONTACT.LNK</span>
+        </div>
+
+        <div className="retro-window-buttons" aria-hidden="true">
+          <span className="retro-window-button">_</span>
+          <span className="retro-window-button">X</span>
+        </div>
+      </div>
+
+      <div className="contact-links-body">
+        <button
+          className="other-contact-link"
+          type="button"
+          onClick={() => handleContactCopy('garylau_ai', 'wechat')}
+        >
+          <span className="other-contact-copy">
+            <span>
+              <strong>微信：</strong>
+              <span className="other-contact-value">garylau_ai</span>
+            </span>
+            <small>请备注来意</small>
+          </span>
+          <span className="copy-state" aria-live="polite">
+            {copiedContact === 'wechat' ? 'COPIED' : 'COPY'}
+          </span>
+        </button>
+
+        <a className="other-contact-link" href="mailto:garylaulgy@gmail.com">
+          <span className="other-contact-copy">
+            <span>
+              <strong>邮箱：</strong>
+              <span className="other-contact-value">garylaulgy@gmail.com</span>
+            </span>
+          </span>
+          <span aria-hidden="true">↗</span>
+        </a>
+
+        <button
+          className="other-contact-link"
+          type="button"
+          onClick={() => handleContactCopy('1192575030', 'qq')}
+        >
+          <span className="other-contact-copy">
+            <span>
+              <strong>QQ：</strong>
+              <span className="other-contact-value">1192575030</span>
+            </span>
+          </span>
+          <span className="copy-state" aria-live="polite">
+            {copiedContact === 'qq' ? 'COPIED' : 'COPY'}
+          </span>
+        </button>
+      </div>
+
+      <span className="retro-scanlines" aria-hidden="true" />
+    </aside>
+  )
+}
+
+function WechatQrWindow() {
+  return (
+    <aside className="qr-window" aria-label="微信二维码">
+      <div className="retro-titlebar">
+        <div className="retro-title-left">
+          <span>WECHAT.QR</span>
+        </div>
+
+        <div className="retro-window-buttons" aria-hidden="true">
+          <span className="retro-window-button">_</span>
+          <span className="retro-window-button">X</span>
+        </div>
+      </div>
+
+      <div className="qr-window-body">
+        <div className="qr-crop">
+          <img src="/assets/wechat-garylau-qr.jpg" alt="GaryLau 微信二维码" />
+        </div>
+      </div>
     </aside>
   )
 }
@@ -406,8 +532,99 @@ type PortraitStageProps = {
   onNavigate: (view: ViewMode) => void
 }
 
+type CursorGuidePosition = {
+  cycle: number
+  fromX: number
+  fromY: number
+  toX: number
+  toY: number
+}
+
+function MacCursorGuide({
+  active,
+  targetRef,
+}: {
+  active: boolean
+  targetRef: RefObject<HTMLAnchorElement | null>
+}) {
+  const [position, setPosition] = useState<CursorGuidePosition | null>(null)
+
+  useEffect(() => {
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const finePointer = window.matchMedia('(pointer: fine)').matches
+
+    if (!active || reducedMotion || !finePointer) {
+      setPosition(null)
+      return
+    }
+
+    let cycle = 0
+    let intervalId: number | null = null
+
+    const playGuide = () => {
+      const target = targetRef.current?.getBoundingClientRect()
+      if (!target) return
+
+      cycle += 1
+      setPosition({
+        cycle,
+        fromX: window.innerWidth + 48,
+        fromY: window.innerHeight + 48,
+        toX: target.left + target.width * 0.5,
+        toY: target.top + target.height * 0.5,
+      })
+    }
+
+    const initialId = window.setTimeout(() => {
+      playGuide()
+      intervalId = window.setInterval(playGuide, 20_000)
+    }, 8_000)
+
+    return () => {
+      window.clearTimeout(initialId)
+      if (intervalId) window.clearInterval(intervalId)
+      setPosition(null)
+    }
+  }, [active, targetRef])
+
+  if (!position) return null
+
+  const style = {
+    '--guide-from-x': `${position.fromX}px`,
+    '--guide-from-y': `${position.fromY}px`,
+    '--guide-to-x': `${position.toX}px`,
+    '--guide-to-y': `${position.toY}px`,
+  } as CSSProperties
+
+  return (
+    <span
+      key={position.cycle}
+      className="mac-cursor-guide"
+      style={style}
+      aria-hidden="true"
+    >
+      <svg className="mac-cursor-arrow" viewBox="0 0 32 40" focusable="false">
+        <path d="M3 2.5v29.1l7.2-7 5.2 12.3 6.1-2.7-5.3-12.1h10.7L3 2.5Z" />
+      </svg>
+
+      <span className="mac-cursor-hand">
+        <svg viewBox="-2 0 90 122" focusable="false">
+          <g transform="scale(.68 1)">
+            <path
+              className="mac-cursor-hand-shape"
+              d="M29 73V17C29 10 34 5 41 5s12 5 12 12v32h2V38c0-7 5-12 11-12s11 5 11 12v15h2v-7c0-7 5-12 11-12s11 5 11 12v12h2v-4c0-7 5-12 11-12s11 5 11 12v21c0 26-14 41-39 41H42c-11 0-18-5-24-15L3 76c-3-5-2-12 3-15s11-2 15 3l8 9Z"
+            />
+          </g>
+        </svg>
+        <span className="mac-cursor-click-ring" />
+      </span>
+    </span>
+  )
+}
+
 function PortraitStage({ view, isSwitching, onNavigate }: PortraitStageProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
+  const contactNavRef = useRef<HTMLAnchorElement>(null)
   const targetTimeRef = useRef(0)
   const previousXRef = useRef<number | null>(null)
   const seekingRef = useRef(false)
@@ -554,6 +771,7 @@ function PortraitStage({ view, isSwitching, onNavigate }: PortraitStageProps) {
               关于
             </a>
             <a
+              ref={contactNavRef}
               href="#contact"
               aria-current={view === 'contact' ? 'page' : undefined}
               onClick={handleNavigation('contact')}
@@ -574,7 +792,13 @@ function PortraitStage({ view, isSwitching, onNavigate }: PortraitStageProps) {
             </div>
           </>
         ) : (
-          <ContactWindow />
+          <>
+            <ContactWindow />
+            <div className="secondary-window-row secondary-window-row--contact">
+              <OtherContactWindow />
+              <WechatQrWindow />
+            </div>
+          </>
         )}
       </div>
 
@@ -597,6 +821,11 @@ function PortraitStage({ view, isSwitching, onNavigate }: PortraitStageProps) {
           <span className="crt-signal-line" />
         </span>
       </div>
+
+      <MacCursorGuide
+        active={view === 'about' && !isSwitching}
+        targetRef={contactNavRef}
+      />
     </main>
   )
 }
