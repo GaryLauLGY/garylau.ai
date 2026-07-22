@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { MouseEvent as ReactMouseEvent, useCallback, useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 
@@ -100,7 +100,33 @@ function SocialWindow() {
   )
 }
 
-function ScrubVideo() {
+type ViewMode = 'about' | 'contact'
+
+const videoConfig: Record<
+  ViewMode,
+  { src: string; poster: string; initialTime: number; label: string }
+> = {
+  about: {
+    src: '/assets/mainframe-robot-motion.mp4?v=white-2',
+    poster: '/assets/mainframe-robot-poster.png',
+    initialTime: 1,
+    label: '跟随横向鼠标移动转动的 GaryLau 电脑头人物',
+  },
+  contact: {
+    src: '/assets/garylau-crt-smile-scrub.mp4?v=1',
+    poster: '/assets/garylau-crt-smile-scrub-poster.png',
+    initialTime: 1,
+    label: '跟随横向鼠标移动闪烁的绿色 GaryLau CRT 肖像',
+  },
+}
+
+type PortraitStageProps = {
+  view: ViewMode
+  isSwitching: boolean
+  onNavigate: (view: ViewMode) => void
+}
+
+function PortraitStage({ view, isSwitching, onNavigate }: PortraitStageProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const targetTimeRef = useRef(0)
   const previousXRef = useRef<number | null>(null)
@@ -110,11 +136,15 @@ function ScrubVideo() {
     const video = videoRef.current
     if (!video) return
 
+    const config = videoConfig[view]
     const sensitivity = 0.8
     const seekTolerance = 1 / 48
-    const motionVideoUrl = '/assets/mainframe-robot-motion.mp4?v=white-2'
     const preloadController = new AbortController()
     let objectUrl: string | null = null
+
+    previousXRef.current = null
+    targetTimeRef.current = 0
+    seekingRef.current = false
 
     const seekToTarget = () => {
       if (seekingRef.current || !Number.isFinite(video.duration)) return
@@ -125,7 +155,7 @@ function ScrubVideo() {
 
     const onMetadata = () => {
       video.pause()
-      targetTimeRef.current = Math.min(video.duration, 1)
+      targetTimeRef.current = Math.min(video.duration, config.initialTime)
       seekingRef.current = true
       video.currentTime = targetTimeRef.current
     }
@@ -142,7 +172,10 @@ function ScrubVideo() {
 
       const delta = currentX - previousX
       const offset = (delta / window.innerWidth) * sensitivity * video.duration
-      targetTimeRef.current = Math.min(video.duration, Math.max(0, targetTimeRef.current + offset))
+      targetTimeRef.current = Math.min(
+        video.duration,
+        Math.max(0, targetTimeRef.current + offset),
+      )
       seekToTarget()
     }
 
@@ -160,7 +193,7 @@ function ScrubVideo() {
       if (touch) moveToX(touch.clientX)
     }
 
-    const resetPointer = () => {
+    const resetScrubPointer = () => {
       previousXRef.current = null
     }
 
@@ -169,14 +202,14 @@ function ScrubVideo() {
     window.addEventListener('mousemove', onMouseMove, { passive: true })
     window.addEventListener('touchstart', onTouchStart, { passive: true })
     window.addEventListener('touchmove', onTouchMove, { passive: true })
-    window.addEventListener('touchend', resetPointer, { passive: true })
-    window.addEventListener('touchcancel', resetPointer, { passive: true })
-    window.addEventListener('blur', resetPointer)
-    document.documentElement.addEventListener('mouseleave', resetPointer)
+    window.addEventListener('touchend', resetScrubPointer, { passive: true })
+    window.addEventListener('touchcancel', resetScrubPointer, { passive: true })
+    window.addEventListener('blur', resetScrubPointer)
+    document.documentElement.addEventListener('mouseleave', resetScrubPointer)
 
     const preloadVideo = async () => {
       try {
-        const response = await fetch(motionVideoUrl, {
+        const response = await fetch(config.src, {
           cache: 'force-cache',
           signal: preloadController.signal,
         })
@@ -191,7 +224,7 @@ function ScrubVideo() {
         video.load()
       } catch {
         if (preloadController.signal.aborted) return
-        video.src = motionVideoUrl
+        video.src = config.src
         video.load()
       }
     }
@@ -205,25 +238,48 @@ function ScrubVideo() {
       window.removeEventListener('mousemove', onMouseMove)
       window.removeEventListener('touchstart', onTouchStart)
       window.removeEventListener('touchmove', onTouchMove)
-      window.removeEventListener('touchend', resetPointer)
-      window.removeEventListener('touchcancel', resetPointer)
-      window.removeEventListener('blur', resetPointer)
-      document.documentElement.removeEventListener('mouseleave', resetPointer)
+      window.removeEventListener('touchend', resetScrubPointer)
+      window.removeEventListener('touchcancel', resetScrubPointer)
+      window.removeEventListener('blur', resetScrubPointer)
+      document.documentElement.removeEventListener('mouseleave', resetScrubPointer)
       if (objectUrl) URL.revokeObjectURL(objectUrl)
     }
-  }, [])
+  }, [view])
+
+  const handleNavigation =
+    (nextView: ViewMode) => (event: ReactMouseEvent<HTMLAnchorElement>) => {
+      event.preventDefault()
+      onNavigate(nextView)
+    }
 
   return (
     <main className="hero-stage">
       <header className="site-header">
         <div className="site-header-inner">
-          <div className="site-brand" aria-label="garylau.ai home">
+          <a
+            className="site-brand"
+            href="#about"
+            aria-label="garylau.ai home"
+            onClick={handleNavigation('about')}
+          >
             garylau.ai
-          </div>
+          </a>
 
           <nav className="site-nav" aria-label="主导航">
-            <button type="button">关于</button>
-            <button type="button">联系我</button>
+            <a
+              href="#about"
+              aria-current={view === 'about' ? 'page' : undefined}
+              onClick={handleNavigation('about')}
+            >
+              关于
+            </a>
+            <a
+              href="#contact"
+              aria-current={view === 'contact' ? 'page' : undefined}
+              onClick={handleNavigation('contact')}
+            >
+              联系我
+            </a>
           </nav>
         </div>
       </header>
@@ -233,22 +289,99 @@ function ScrubVideo() {
         <SocialWindow />
       </div>
 
-      <video
-        ref={videoRef}
-        className="hero-video"
-        muted
-        playsInline
-        preload="auto"
-        poster="/assets/mainframe-robot-poster.png"
-        draggable={false}
-        aria-label="GaryLau CRT-headed figure controlled by horizontal pointer movement"
-      />
+      <div
+        className={`hero-portrait hero-portrait--${view}${isSwitching ? ' is-switching' : ''}`}
+      >
+        <video
+          key={view}
+          ref={videoRef}
+          className="hero-portrait-video"
+          muted
+          playsInline
+          preload="auto"
+          poster={videoConfig[view].poster}
+          aria-label={videoConfig[view].label}
+          draggable={false}
+        />
+        <span className="crt-screen-effect" aria-hidden="true">
+          <span className="crt-screen-noise" />
+          <span className="crt-signal-line" />
+        </span>
+      </div>
     </main>
   )
 }
 
 function App() {
-  return <ScrubVideo />
+  const [view, setView] = useState<ViewMode>(() =>
+    window.location.hash === '#contact' ? 'contact' : 'about',
+  )
+  const [isSwitching, setIsSwitching] = useState(false)
+  const viewRef = useRef(view)
+  const switchingRef = useRef(false)
+  const timersRef = useRef<number[]>([])
+
+  const clearTransitionTimers = useCallback(() => {
+    timersRef.current.forEach((timer) => window.clearTimeout(timer))
+    timersRef.current = []
+  }, [])
+
+  const transitionTo = useCallback(
+    (nextView: ViewMode, updateHash: boolean) => {
+      if (nextView === viewRef.current && !switchingRef.current) return
+
+      clearTransitionTimers()
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+      if (updateHash && window.location.hash !== `#${nextView}`) {
+        window.history.pushState(null, '', `#${nextView}`)
+      }
+
+      if (reducedMotion) {
+        viewRef.current = nextView
+        setView(nextView)
+        setIsSwitching(false)
+        switchingRef.current = false
+        return
+      }
+
+      switchingRef.current = true
+      setIsSwitching(true)
+
+      timersRef.current = [
+        window.setTimeout(() => {
+          viewRef.current = nextView
+          setView(nextView)
+        }, 140),
+        window.setTimeout(() => {
+          switchingRef.current = false
+          setIsSwitching(false)
+          timersRef.current = []
+        }, 320),
+      ]
+    },
+    [clearTransitionTimers],
+  )
+
+  useEffect(() => {
+    const syncViewToHash = () => {
+      transitionTo(window.location.hash === '#contact' ? 'contact' : 'about', false)
+    }
+
+    window.addEventListener('hashchange', syncViewToHash)
+    return () => {
+      window.removeEventListener('hashchange', syncViewToHash)
+      clearTransitionTimers()
+    }
+  }, [clearTransitionTimers, transitionTo])
+
+  return (
+    <PortraitStage
+      view={view}
+      isSwitching={isSwitching}
+      onNavigate={(nextView) => transitionTo(nextView, true)}
+    />
+  )
 }
 
 createRoot(document.getElementById('root')!).render(<App />)
