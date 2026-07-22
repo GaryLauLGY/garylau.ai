@@ -124,7 +124,8 @@ body,
 }
 
 .about-window,
-.social-window {
+.social-window,
+.current-window {
   position: relative;
   overflow: hidden;
   border: 2px solid #fff;
@@ -151,6 +152,25 @@ body,
     inset -1px -1px 0 #404040,
     8px 10px 0 rgba(0, 0, 0, 0.1);
   pointer-events: auto;
+}
+
+.secondary-window-row {
+  display: flex;
+  width: 100%;
+  gap: 40px;
+  align-items: stretch;
+}
+
+.current-window {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  box-shadow:
+    inset 1px 1px 0 #fff,
+    inset -1px -1px 0 #404040,
+    8px 10px 0 rgba(0, 0, 0, 0.1);
+  pointer-events: none;
 }
 
 .retro-titlebar {
@@ -305,6 +325,59 @@ body,
   display: grid;
   padding: 12px 14px 14px;
   gap: 7px;
+}
+
+.current-window-body {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  min-height: 143px;
+  padding: 14px 16px 13px;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
+  border: 4px solid #d4d0c8;
+  border-top-width: 6px;
+  background: #070b08;
+  color: #b8ffbf;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 11px;
+  line-height: 1.4;
+  text-shadow: 0 0 5px rgba(80, 255, 105, 0.42);
+}
+
+.current-command {
+  margin: 0 0 10px;
+  color: #7ccf84;
+  opacity: 0.78;
+  white-space: nowrap;
+}
+
+.current-project-list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  gap: 7px;
+  list-style: none;
+}
+
+.current-project-list li {
+  position: relative;
+  padding-left: 13px;
+  overflow-wrap: anywhere;
+}
+
+.current-project-list li::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  content: ">";
+}
+
+.current-cursor {
+  margin-top: auto;
+  align-self: flex-start;
+  animation: status-blink 1s step-end infinite;
 }
 
 .social-link {
@@ -636,7 +709,13 @@ body,
     min-height: clamp(300px, 38svh, 390px);
   }
 
-  .social-window {
+  .secondary-window-row {
+    flex-direction: column;
+    gap: clamp(24px, 3svh, 34px);
+  }
+
+  .social-window,
+  .current-window {
     width: min(100%, 430px);
   }
 
@@ -657,7 +736,8 @@ body,
     gap: 24px;
   }
 
-  .social-window {
+  .social-window,
+  .current-window {
     width: min(100%, 430px);
   }
 
@@ -696,7 +776,8 @@ body,
     gap: 20px;
   }
 
-  .social-window {
+  .social-window,
+  .current-window {
     width: 100%;
   }
 
@@ -733,6 +814,7 @@ body,
 
 @media (prefers-reduced-motion: reduce) {
   .retro-status-panel strong,
+  .current-cursor,
   .hero-portrait,
   .hero-portrait.is-switching,
   .hero-portrait.is-switching .crt-screen-effect,

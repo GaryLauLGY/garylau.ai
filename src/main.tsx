@@ -100,6 +100,41 @@ function SocialWindow() {
   )
 }
 
+const currentProjects = [
+  'WayneInsightSpring — Study Abroad Q&A Agent',
+  'MedFlow — Knowledge Base Development',
+  'MedFlow — GEO Optimization',
+]
+
+function CurrentProjectsWindow() {
+  return (
+    <aside className="current-window" aria-label="Current projects">
+      <div className="retro-titlebar">
+        <div className="retro-title-left">
+          <span>CURRENT.LOG</span>
+        </div>
+
+        <div className="retro-window-buttons" aria-hidden="true">
+          <span className="retro-window-button">_</span>
+          <span className="retro-window-button">X</span>
+        </div>
+      </div>
+
+      <div className="current-window-body">
+        <p className="current-command">C:\GARY\PROJECTS&gt; list --active</p>
+        <ul className="current-project-list">
+          {currentProjects.map((project) => (
+            <li key={project}>{project}</li>
+          ))}
+        </ul>
+        <span className="current-cursor" aria-hidden="true">_</span>
+      </div>
+
+      <span className="retro-scanlines" aria-hidden="true" />
+    </aside>
+  )
+}
+
 type ViewMode = 'about' | 'contact'
 
 const videoConfig: Record<
@@ -286,7 +321,10 @@ function PortraitStage({ view, isSwitching, onNavigate }: PortraitStageProps) {
 
       <div className="profile-cluster">
         <AboutWindow />
-        <SocialWindow />
+        <div className="secondary-window-row">
+          <SocialWindow />
+          <CurrentProjectsWindow />
+        </div>
       </div>
 
       <div
