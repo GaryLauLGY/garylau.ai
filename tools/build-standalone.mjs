@@ -25,6 +25,7 @@ const standalone = `<!doctype html>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#ffffff" />
     <meta name="description" content="Mainframe — an independent creative studio for ideas with a pulse." />
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" defer></script>
     <title>GaryLau｜刘耕宇</title>
     <style>${css}</style>
   </head>

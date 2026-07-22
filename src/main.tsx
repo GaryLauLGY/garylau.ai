@@ -1,4 +1,11 @@
-import { MouseEvent as ReactMouseEvent, useCallback, useEffect, useRef, useState } from 'react'
+import {
+  FormEvent,
+  MouseEvent as ReactMouseEvent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 
@@ -132,6 +139,244 @@ function CurrentProjectsWindow() {
 
       <span className="retro-scanlines" aria-hidden="true" />
     </aside>
+  )
+}
+
+type ContactStatus =
+  | 'incomplete'
+  | 'ready'
+  | 'verifying'
+  | 'sending'
+  | 'success'
+  | 'error'
+  | 'rate-limited'
+
+const contactStatusCopy: Record<ContactStatus, string> = {
+  incomplete: 'INCOMPLETE',
+  ready: 'READY',
+  verifying: 'VERIFYING...',
+  sending: 'TRANSMITTING...',
+  success: 'MESSAGE SENT',
+  error: 'SEND FAILED — RETRY',
+  'rate-limited': 'TOO MANY REQUESTS — WAIT',
+}
+
+const contactEndpoint =
+  import.meta.env.VITE_CONTACT_ENDPOINT?.trim() || 'https://contact-api.garylau.ai'
+const turnstileSiteKey =
+  import.meta.env.VITE_TURNSTILE_SITE_KEY?.trim() || '0x4AAAAAAD7PaKrpyPWrdkPZ'
+
+function ContactWindow() {
+  const [status, setStatus] = useState<ContactStatus>('incomplete')
+  const [isComplete, setIsComplete] = useState(false)
+  const [turnstileToken, setTurnstileToken] = useState('')
+  const formStartedAtRef = useRef(Date.now())
+  const turnstileContainerRef = useRef<HTMLDivElement>(null)
+  const turnstileWidgetRef = useRef<string | null>(null)
+
+  useEffect(() => {
+    if (window.location.protocol === 'file:') return
+
+    let cancelled = false
+    let attempts = 0
+
+    const renderTurnstile = () => {
+      if (cancelled || turnstileWidgetRef.current || !turnstileContainerRef.current) return
+
+      if (!window.turnstile) {
+        attempts += 1
+        if (attempts < 80) window.setTimeout(renderTurnstile, 100)
+        return
+      }
+
+      turnstileWidgetRef.current = window.turnstile.render(turnstileContainerRef.current, {
+        sitekey: turnstileSiteKey,
+        action: 'contact',
+        appearance: 'interaction-only',
+        size: 'flexible',
+        theme: 'light',
+        callback: (token) => setTurnstileToken(token),
+        'expired-callback': () => setTurnstileToken(''),
+        'error-callback': () => setTurnstileToken(''),
+      })
+    }
+
+    renderTurnstile()
+
+    return () => {
+      cancelled = true
+      if (turnstileWidgetRef.current && window.turnstile) {
+        window.turnstile.remove(turnstileWidgetRef.current)
+      }
+      turnstileWidgetRef.current = null
+    }
+  }, [])
+
+  const updateCompletion = (form: HTMLFormElement) => {
+    const complete = form.checkValidity()
+    setIsComplete(complete)
+    if (status !== 'sending') setStatus(complete ? 'ready' : 'incomplete')
+  }
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const form = event.currentTarget
+
+    if (!form.checkValidity()) {
+      setIsComplete(false)
+      setStatus('incomplete')
+      form.reportValidity()
+      return
+    }
+
+    if (!turnstileToken) {
+      setStatus('verifying')
+      return
+    }
+
+    setStatus('sending')
+
+    try {
+      const formData = new FormData(form)
+      const payload = {
+        ...Object.fromEntries(formData.entries()),
+        turnstileToken,
+        startedAt: formStartedAtRef.current,
+      }
+      const response = await fetch(contactEndpoint, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      })
+
+      if (response.status === 429) {
+        setStatus('rate-limited')
+        return
+      }
+      if (!response.ok) throw new Error(`Contact request failed: ${response.status}`)
+
+      form.reset()
+      setIsComplete(false)
+      setStatus('success')
+      setTurnstileToken('')
+      formStartedAtRef.current = Date.now()
+      if (turnstileWidgetRef.current && window.turnstile) {
+        window.turnstile.reset(turnstileWidgetRef.current)
+      }
+    } catch {
+      setStatus('error')
+    }
+  }
+
+  return (
+    <section className="contact-window" aria-labelledby="contact-title">
+      <div className="retro-titlebar">
+        <div className="retro-title-left">
+          <span>CONTACT.EXE</span>
+        </div>
+
+        <div className="retro-window-buttons" aria-hidden="true">
+          <span className="retro-window-button">_</span>
+          <span className="retro-window-button">[]</span>
+          <span className="retro-window-button">X</span>
+        </div>
+      </div>
+
+      <form
+        className="contact-window-body"
+        onSubmit={handleSubmit}
+        onInput={(event) => updateCompletion(event.currentTarget)}
+        onChange={(event) => updateCompletion(event.currentTarget)}
+      >
+        <h1 id="contact-title">Start a project</h1>
+
+        <fieldset className="contact-group-box">
+          <legend>Project Brief</legend>
+
+          <div className="contact-form-grid">
+            <label className="contact-field">
+              <span>NAME *</span>
+              <input name="name" type="text" autoComplete="name" required maxLength={80} />
+            </label>
+
+            <label className="contact-field">
+              <span>COMPANY *</span>
+              <input
+                name="company"
+                type="text"
+                autoComplete="organization"
+                required
+                maxLength={100}
+              />
+            </label>
+
+            <label className="contact-field contact-field--wide">
+              <span>EMAIL *</span>
+              <input name="email" type="email" autoComplete="email" required maxLength={160} />
+            </label>
+
+            <label className="contact-field">
+              <span>PROJECT STAGE *</span>
+              <select name="stage" defaultValue="" required>
+                <option value="" disabled>Select stage</option>
+                <option value="idea">Early idea</option>
+                <option value="planning">Planning</option>
+                <option value="building">Already building</option>
+                <option value="optimization">Optimization</option>
+              </select>
+            </label>
+
+            <label className="contact-field">
+              <span>BUDGET *</span>
+              <select name="budget" defaultValue="" required>
+                <option value="" disabled>Select range</option>
+                <option value="under-10k">Under ¥10K</option>
+                <option value="10k-30k">¥10K–30K</option>
+                <option value="30k-100k">¥30K–100K</option>
+                <option value="100k-plus">¥100K+</option>
+                <option value="unsure">Not sure yet</option>
+              </select>
+            </label>
+
+            <label className="contact-field contact-field--wide">
+              <span>BRIEF *</span>
+              <textarea
+                name="brief"
+                required
+                maxLength={500}
+                placeholder="What are you building, and where are you stuck?"
+              />
+            </label>
+
+            <label className="contact-honeypot" aria-hidden="true">
+              <span>WEBSITE</span>
+              <input name="website" type="text" tabIndex={-1} autoComplete="off" />
+            </label>
+          </div>
+        </fieldset>
+
+        <div
+          ref={turnstileContainerRef}
+          className="contact-turnstile"
+          aria-label="Security verification"
+        />
+
+        <div className="contact-action-row">
+          <button type="submit" disabled={!isComplete || status === 'sending'}>
+            {status === 'sending' ? 'SENDING...' : 'SEND BRIEF'}
+          </button>
+          <div className={`contact-status contact-status--${status}`} aria-live="polite">
+            <span>STATUS:</span>
+            <strong>{contactStatusCopy[status]}</strong>
+          </div>
+        </div>
+      </form>
+
+      <span className="retro-scanlines" aria-hidden="true" />
+    </section>
   )
 }
 
@@ -319,12 +564,18 @@ function PortraitStage({ view, isSwitching, onNavigate }: PortraitStageProps) {
         </div>
       </header>
 
-      <div className="profile-cluster">
-        <AboutWindow />
-        <div className="secondary-window-row">
-          <SocialWindow />
-          <CurrentProjectsWindow />
-        </div>
+      <div className={`profile-cluster profile-cluster--${view}`}>
+        {view === 'about' ? (
+          <>
+            <AboutWindow />
+            <div className="secondary-window-row">
+              <SocialWindow />
+              <CurrentProjectsWindow />
+            </div>
+          </>
+        ) : (
+          <ContactWindow />
+        )}
       </div>
 
       <div

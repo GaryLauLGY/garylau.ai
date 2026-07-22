@@ -2,6 +2,8 @@ node_modules/
 dist/
 *.tsbuildinfo
 .DS_Store
+.dev.vars*
+.env*
 
 # Local production materials that are not needed by the website runtime.
 deliverables/

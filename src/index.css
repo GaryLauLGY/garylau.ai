@@ -125,7 +125,8 @@ body,
 
 .about-window,
 .social-window,
-.current-window {
+.current-window,
+.contact-window {
   position: relative;
   overflow: hidden;
   border: 2px solid #fff;
@@ -143,6 +144,11 @@ body,
 .about-window {
   width: 100%;
   pointer-events: none;
+}
+
+.contact-window {
+  width: 100%;
+  pointer-events: auto;
 }
 
 .social-window {
@@ -377,6 +383,203 @@ body,
 .current-cursor {
   margin-top: auto;
   align-self: flex-start;
+  animation: status-blink 1s step-end infinite;
+}
+
+.contact-window-body {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  min-height: 390px;
+  padding: 20px 24px 22px;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.contact-window-body h1 {
+  margin: 0;
+  color: #000;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1.3;
+}
+
+.contact-group-box {
+  min-width: 0;
+  margin: 0;
+  padding: 12px 14px 14px;
+  border: 2px solid #404040;
+  border-right-color: #fff;
+  border-bottom-color: #fff;
+}
+
+.contact-group-box legend {
+  padding: 0 8px;
+  color: #222;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.contact-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px 12px;
+}
+
+.contact-field {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+
+.contact-field--wide {
+  grid-column: 1 / -1;
+}
+
+.contact-field > span {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+
+.contact-field input,
+.contact-field select,
+.contact-field textarea {
+  width: 100%;
+  min-width: 0;
+  border: 2px solid #404040;
+  border-right-color: #fff;
+  border-bottom-color: #fff;
+  border-radius: 0;
+  outline: none;
+  background: #fff;
+  color: #111;
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+.contact-field input,
+.contact-field select {
+  height: 34px;
+  padding: 6px 9px;
+}
+
+.contact-field textarea {
+  min-height: 58px;
+  padding: 8px 9px;
+  resize: vertical;
+}
+
+.contact-field textarea::placeholder {
+  color: #666;
+  opacity: 1;
+}
+
+.contact-honeypot {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.contact-turnstile {
+  position: absolute;
+  z-index: 30;
+  right: 24px;
+  bottom: 64px;
+  width: min(300px, calc(100% - 48px));
+  min-height: 0;
+  overflow: visible;
+  pointer-events: auto;
+}
+
+.contact-field input:focus,
+.contact-field select:focus,
+.contact-field textarea:focus {
+  outline: 1px dotted #000;
+  outline-offset: -5px;
+}
+
+.contact-action-row {
+  display: grid;
+  grid-template-columns: minmax(140px, 0.38fr) minmax(0, 1fr);
+  gap: 12px;
+}
+
+.contact-action-row button {
+  min-height: 36px;
+  padding: 7px 12px;
+  border: 2px solid #fff;
+  border-right-color: #000;
+  border-bottom-color: #000;
+  background: #000;
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.contact-action-row button:hover:not(:disabled),
+.contact-action-row button:focus-visible {
+  background: #fff;
+  color: #000;
+}
+
+.contact-action-row button:focus-visible {
+  outline: 2px dashed #000;
+  outline-offset: 3px;
+}
+
+.contact-action-row button:disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+
+.contact-status {
+  display: flex;
+  min-width: 0;
+  min-height: 36px;
+  padding: 7px 10px;
+  border: 2px solid #404040;
+  border-right-color: #fff;
+  border-bottom-color: #fff;
+  background: #fff;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 11px;
+  line-height: 1;
+}
+
+.contact-status strong {
+  overflow: hidden;
+  color: #008000;
+  font-weight: 700;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.contact-status--incomplete strong,
+.contact-status--verifying strong,
+.contact-status--rate-limited strong {
+  color: #a86f00;
+}
+
+.contact-status--error strong {
+  color: #a40000;
+}
+
+.contact-status--sending strong {
   animation: status-blink 1s step-end infinite;
 }
 
@@ -789,6 +992,31 @@ body,
 
   .retro-window-body h1 {
     font-size: 20px;
+  }
+
+  .contact-window-body {
+    min-height: 0;
+    padding: 16px;
+    gap: 14px;
+  }
+
+  .contact-window-body h1 {
+    font-size: 20px;
+  }
+
+  .contact-turnstile {
+    right: 16px;
+    bottom: 68px;
+    width: min(300px, calc(100% - 32px));
+  }
+
+  .contact-form-grid,
+  .contact-action-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .contact-field--wide {
+    grid-column: auto;
   }
 
   .retro-group-box {

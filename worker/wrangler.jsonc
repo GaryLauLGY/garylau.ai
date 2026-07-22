@@ -1,0 +1,45 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "garylau-contact-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-07-22",
+  "workers_dev": true,
+  "routes": [
+    {
+      "pattern": "contact-api.garylau.ai",
+      "custom_domain": true
+    }
+  ],
+  "vars": {
+    "ALLOWED_ORIGINS": "https://garylau.ai,https://www.garylau.ai",
+    "RECIPIENT_EMAIL": "garylaulgy@gmail.com",
+    "SENDER_EMAIL": "contact@garylau.ai"
+  },
+  "send_email": [
+    {
+      "name": "EMAIL",
+      "destination_address": "garylaulgy@gmail.com"
+    }
+  ],
+  "ratelimits": [
+    {
+      "name": "IP_RATE_LIMITER",
+      "namespace_id": "35101",
+      "simple": {
+        "limit": 5,
+        "period": 60
+      }
+    },
+    {
+      "name": "EMAIL_RATE_LIMITER",
+      "namespace_id": "35102",
+      "simple": {
+        "limit": 2,
+        "period": 60
+      }
+    }
+  ],
+  "observability": {
+    "enabled": true
+  }
+}
